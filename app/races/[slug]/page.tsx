@@ -10,6 +10,7 @@ import { SplitReveal } from "@/components/motion/SplitReveal";
 import { TrackRender } from "@/components/track/TrackRender";
 import { Button } from "@/components/ui/Button";
 import { Reveal, Rule } from "@/components/ui/Reveal";
+import { fitDisplay } from "@/lib/fit";
 import { formatRange, pad, roundLabel } from "@/lib/utils";
 
 type Params = { params: Promise<{ slug: string }> };
@@ -66,7 +67,7 @@ export default async function RaceReport({ params }: Params) {
           <span className="eyebrow !text-livery-ink">Round {pad(project.round)}</span>
           <span className="eyebrow">{project.category.join(" · ")}</span>
         </Reveal>
-        <SplitReveal as="h1" text={project.name} className="display mt-6 text-[clamp(48px,10vw,168px)] font-[750]" duration={1.25} />
+        <SplitReveal as="h1" text={project.name} className="display mt-6 font-[750]" style={{ fontSize: fitDisplay(project.name, 10, 168) }} duration={1.25} />
         <Reveal delay={0.3}>
           <p className="display-narrow mt-3 text-[clamp(18px,2vw,28px)] tracking-[0.3em] text-muted uppercase">Grand Prix</p>
         </Reveal>
@@ -245,7 +246,7 @@ export default async function RaceReport({ params }: Params) {
         <nav aria-label="Next race" className="border-t border-line">
           <Link href={`/races/${next.slug}`} data-cursor="Next" className="group wrap block py-[clamp(64px,10vw,140px)]">
             <span className="eyebrow">Next round · {roundLabel(next.round)}</span>
-            <span className="display mt-6 block text-[clamp(44px,9vw,150px)] font-[750] transition-transform duration-700 ease-out group-hover:translate-x-6">
+            <span className="display mt-6 block font-[750] transition-transform duration-700 ease-out group-hover:translate-x-6" style={{ fontSize: fitDisplay(next.name, 9, 150, 0.95) }}>
               {next.name}
             </span>
             <Rule className="mt-8" />

@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { SplitReveal } from "@/components/motion/SplitReveal";
 import { Reveal, Rule } from "@/components/ui/Reveal";
+import { fitDisplay } from "@/lib/fit";
 
 /** Editorial page opener: index + label, oversized title, intro copy, drawn rule. */
 export function PageHeader({
@@ -26,7 +27,7 @@ export function PageHeader({
           {label} — {plain}
         </span>
       </Reveal>
-      <SplitReveal as="h1" text={title} className="display mt-6 text-[clamp(52px,11vw,180px)] font-[750]" duration={1.25} />
+      <SplitReveal as="h1" text={title} className="display mt-6 font-[750]" style={{ fontSize: fitDisplay(title, 11, 180) }} duration={1.25} />
       <Rule className="mt-[clamp(32px,5vw,64px)]" delay={0.3} />
       {(intro || aside) && (
         <div className="mt-8 grid gap-8 md:grid-cols-12">

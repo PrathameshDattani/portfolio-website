@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useInView, useReducedMotion } from "framer-motion";
-import { createElement, useRef, type ReactNode } from "react";
+import { createElement, useRef, type CSSProperties, type ReactNode } from "react";
 import { EASE } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 
@@ -22,6 +22,7 @@ export function SplitReveal({
   duration = 1.1,
   play,
   id,
+  style,
   children,
 }: {
   text: string;
@@ -34,6 +35,7 @@ export function SplitReveal({
   /** Controlled trigger. When omitted, plays on scroll into view. */
   play?: boolean;
   id?: string;
+  style?: CSSProperties;
   children?: ReactNode;
 }) {
   const ref = useRef<HTMLElement>(null);
@@ -44,7 +46,7 @@ export function SplitReveal({
 
   return createElement(
     as,
-    { ref, className: cn("relative", className), id },
+    { ref, className: cn("relative", className), id, style },
     <>
       <span className="sr-only">{text}</span>
       {words.map((w, i) => (

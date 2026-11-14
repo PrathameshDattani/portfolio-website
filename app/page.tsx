@@ -11,10 +11,12 @@ import { SplitReveal } from "@/components/motion/SplitReveal";
 import { WorkList } from "@/components/races/WorkList";
 import { ArrowLink, Button } from "@/components/ui/Button";
 import { Reveal, Rule } from "@/components/ui/Reveal";
+import { fitDisplay } from "@/lib/fit";
 import { formatRange, yearOf } from "@/lib/utils";
 
 export default function HomePage() {
-  const current = experience[0];
+  // latest work role (leadership positions are shown on /seasons)
+  const current = experience.find((e) => e.seat !== "Team Principal") ?? experience[0];
   return (
     <>
       <Hero />
@@ -73,7 +75,7 @@ export default function HomePage() {
               <p className="display metal text-[clamp(72px,10.5vw,170px)] font-[800]">{yearOf(current.start)}</p>
             </Reveal>
             <div className="lg:col-span-7 lg:pt-6">
-              <SplitReveal as="h2" id="season" text={current.company} className="display text-[clamp(36px,5vw,72px)] font-[650]" />
+              <SplitReveal as="h2" id="season" text={current.company} className="display font-[650]" style={{ fontSize: fitDisplay(current.company, 5, 72, 0.55) }} />
               <Reveal delay={0.15}>
                 <p className="mt-4 text-lg text-fg/80">
                   {current.role} <span className="text-muted">· {current.seat}</span>

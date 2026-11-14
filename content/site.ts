@@ -1,7 +1,8 @@
-/** {{SITE_URL}}, {{OG_IMAGE}}, {{ANALYTICS_ID}} and feature flags. */
+/** Site settings and feature flags. */
 export const site = {
+  // SET: your deployed domain (used for sitemap, OG image and SEO)
   url: "https://example.com",
-  description: "A motorsport-inspired developer portfolio.",
+  description: "Prathamesh Dattani: AI and backend engineer, Mumbai. A motorsport-inspired portfolio.",
   /** Plausible domain, e.g. "example.com". Leave empty to disable analytics. */
   analyticsId: "",
   enableIntroLights: true,

@@ -8,6 +8,7 @@ import { theme } from "@/content/theme";
 import { useLenis } from "@/components/layout/SmoothScroll";
 import { SplitReveal } from "@/components/motion/SplitReveal";
 import { EASE } from "@/lib/motion";
+import { fitDisplay } from "@/lib/fit";
 import { pad } from "@/lib/utils";
 import { Gantry } from "./Gantry";
 import type { NightTrack } from "./night-track";
@@ -207,7 +208,7 @@ export function Hero() {
           </p>
         </motion.div>
 
-        <h1 id="hero-title" className="display text-[clamp(56px,13.5vw,220px)] font-[750]">
+        <h1 id="hero-title" className="display font-[750]" style={{ fontSize: fitDisplay(profile.fullName, 13.5, 220) }}>
           <span className="sr-only">{`${profile.fullName}, ${profile.roleTitle}`}</span>
           <span aria-hidden className="block">
             <SplitReveal as="span" text={first ?? ""} play={racing} className="block" duration={1.3} />

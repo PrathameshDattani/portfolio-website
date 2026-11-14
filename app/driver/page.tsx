@@ -7,6 +7,7 @@ import { SectionLabel } from "@/components/layout/PageHeader";
 import { SplitReveal } from "@/components/motion/SplitReveal";
 import { ArrowLink } from "@/components/ui/Button";
 import { Reveal, Rule } from "@/components/ui/Reveal";
+import { fitDisplay } from "@/lib/fit";
 import { pad } from "@/lib/utils";
 
 export const metadata: Metadata = { title: "Driver Profile · About", description: profile.bioShort };
@@ -26,7 +27,7 @@ export default function DriverPage() {
           <span className="eyebrow !text-livery-ink">(01)</span>
           <span className="eyebrow">Driver profile — About</span>
         </Reveal>
-        <SplitReveal as="h1" text={profile.fullName} className="display mt-6 text-[clamp(52px,11vw,180px)] font-[750]" duration={1.25} />
+        <SplitReveal as="h1" text={profile.fullName} className="display mt-6 font-[750]" style={{ fontSize: fitDisplay(profile.fullName, 11, 180) }} duration={1.25} />
         <Rule className="mt-[clamp(32px,5vw,64px)]" delay={0.3} />
 
         <div className="mt-12 grid gap-12 lg:grid-cols-12">

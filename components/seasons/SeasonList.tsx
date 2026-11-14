@@ -5,6 +5,7 @@ import { useRef } from "react";
 import type { Experience } from "@/content/types";
 import { SplitReveal } from "@/components/motion/SplitReveal";
 import { Reveal } from "@/components/ui/Reveal";
+import { fitDisplay } from "@/lib/fit";
 import { formatRange, yearOf } from "@/lib/utils";
 
 /** Seasons with a sticky year and a progress rail that fills as you read. */
@@ -32,7 +33,7 @@ export function SeasonList({ seasons }: { seasons: Experience[] }) {
               </div>
             </div>
             <div className="md:col-span-2 md:pl-12">
-              <SplitReveal as="h2" text={s.company} className="display text-[clamp(36px,5vw,80px)] font-[700]" />
+              <SplitReveal as="h2" text={s.company} className="display font-[700]" style={{ fontSize: fitDisplay(s.company, 5, 80, 0.6) }} />
               <Reveal delay={0.1}>
                 <p className="mt-4 text-lg">
                   {s.role}

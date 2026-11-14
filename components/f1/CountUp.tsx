@@ -32,7 +32,7 @@ export function CountUp({
     return () => c.stop();
   }, [inView, numeric, value, reduce, duration]);
 
-  const decimals = numeric && !Number.isInteger(value) ? 1 : 0;
+  const decimals = numeric ? (String(value).split(".")[1] ?? "").length : 0;
   return (
     <span ref={ref} className={className}>
       {numeric ? n.toFixed(decimals) : value}

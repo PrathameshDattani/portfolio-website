@@ -35,14 +35,14 @@ export default function PodiumPage() {
 
       {top.length > 0 && (
         <section className="wrap" aria-label="Top three">
-          <ol className="grid items-end gap-5 md:grid-cols-3">
+          <ol className={top.length >= 3 ? "grid items-end gap-5 md:grid-cols-3" : top.length === 2 ? "mx-auto grid max-w-4xl items-end gap-5 md:grid-cols-2" : "mx-auto grid max-w-md"}>
             {top.map(({ p, a }, i) => (
               <Reveal as="li" key={p} delay={[0.15, 0, 0.3][i]} className={p === "P1" ? "md:-mb-0" : "md:mb-0"}>
                 <TrophyCard
                   className={`relative flex flex-col overflow-hidden rounded-[6px] border border-line bg-[linear-gradient(180deg,#141417,#0a0a0c)] p-8 ${p === "P1" ? "md:min-h-[520px]" : p === "P2" ? "md:min-h-[440px]" : "md:min-h-[380px]"}`}
                 >
                   <div className="flex items-center justify-between">
-                    <span className="eyebrow">{formatMonth(a!.date)}</span>
+                    <span className="eyebrow">{a!.date ? formatMonth(a!.date) : ""}</span>
                     <span className="eyebrow">{p === "P1" ? "Winner" : p === "P2" ? "Runner-up" : "Third"}</span>
                   </div>
                   <span
@@ -76,7 +76,7 @@ export default function PodiumPage() {
                 </span>
                 <span className="col-span-8 col-start-3 text-sm text-muted md:col-span-3 md:col-start-auto">{a.description}</span>
                 <span className="col-span-2 flex justify-end gap-4 text-sm md:col-span-2">
-                  <span className="font-mono text-muted tabular">{formatMonth(a.date)}</span>
+                  {a.date && <span className="font-mono text-muted tabular">{formatMonth(a.date)}</span>}
                   {a.link && (
                     <a href={a.link} target="_blank" rel="noopener noreferrer" className="after:absolute after:inset-0">
                       ↗<span className="sr-only">View proof for {a.title}</span>
@@ -100,9 +100,7 @@ export default function PodiumPage() {
               <Reveal as="li" key={p.title} delay={i * 0.05}>
                 <a
                   href={p.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  data-cursor="Read"
+                  {...(p.link ? { target: "_blank", rel: "noopener noreferrer", "data-cursor": "Read" } : { "aria-disabled": true })}
                   className="group grid gap-3 border-b border-line py-8 md:grid-cols-12"
                 >
                   <span className="eyebrow !text-livery-ink md:col-span-2">Art. {pad(i + 1)}.1</span>

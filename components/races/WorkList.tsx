@@ -7,6 +7,7 @@ import { useRef, useState } from "react";
 import type { Project } from "@/content/types";
 import { TrackRender } from "@/components/track/TrackRender";
 import { EASE } from "@/lib/motion";
+import { fitDisplay } from "@/lib/fit";
 import { cn, roundLabel, yearOf } from "@/lib/utils";
 
 const STATUS: Record<Project["status"], string> = {
@@ -63,7 +64,10 @@ export function WorkList({ projects, headingLevel = "h3" }: { projects: Project[
               </div>
               <span className="col-span-2 font-mono text-xs text-muted tabular lg:col-span-1">{roundLabel(p.round)}</span>
               <H className="col-span-10 lg:col-span-6">
-                <span className="display block text-[clamp(30px,4.6vw,76px)] font-[650] transition-transform duration-700 ease-out lg:group-hover:translate-x-4">
+                <span
+                  className="display block text-[length:var(--fs-sm)] font-[650] transition-transform duration-700 ease-out lg:text-[length:var(--fs-lg)] lg:group-hover:translate-x-4"
+                  style={{ "--fs-sm": fitDisplay(p.name, 9, 48, 0.8), "--fs-lg": fitDisplay(p.name, 4.6, 76, 0.42) } as React.CSSProperties}
+                >
                   {p.name}
                 </span>
               </H>

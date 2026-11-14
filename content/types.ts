@@ -76,7 +76,8 @@ export type Project = {
 export type Experience = {
   company: string;
   role: string;
-  seat: "Race Driver" | "Test & Reserve Driver" | "Engineer";
+  /** Race Driver = full-time, Test & Reserve Driver = intern, Team Principal = leadership role */
+  seat: "Race Driver" | "Test & Reserve Driver" | "Engineer" | "Team Principal";
   start: string;
   end?: string;
   location?: string;
@@ -111,7 +112,8 @@ export type Achievement = {
   title: string;
   event: string;
   position?: "P1" | "P2" | "P3" | "Finisher";
-  date: string;
+  /** "YYYY-MM" or "YYYY"; optional */
+  date?: string;
   description?: string;
   link?: string;
   featured?: boolean;
