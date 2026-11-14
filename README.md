@@ -8,7 +8,7 @@ A cinematic, motorsport-inspired portfolio built with Next.js 15, Tailwind CSS v
 | `/driver` | Driver Profile: about, stats, education |
 | `/races` and `/races/[slug]` | Race Calendar and Race Reports: projects |
 | `/seasons` | Career Seasons: experience |
-| `/garage` | Garage: skills on an interactive car |
+| `/garage` | Garage: skills as a setup sheet |
 | `/podium` | Trophy Cabinet: achievements and publications |
 | `/pit-wall` | Pit Wall Radio: contact form |
 
