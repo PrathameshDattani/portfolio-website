@@ -2,10 +2,11 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "framer-motion";
-import { Loader2, Send } from "lucide-react";
+import { ArrowUpRight, Loader2 } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import { useForm } from "react-hook-form";
 import { useFlag } from "@/components/f1/FlagBanner";
+import { Magnetic } from "@/components/motion/Magnetic";
 import { contactSchema, SUBJECTS, type ContactInput } from "@/lib/contact-schema";
 import { cn } from "@/lib/utils";
 
@@ -14,64 +15,31 @@ const COOLDOWN_MS = 60_000;
 const ENDPOINT = process.env.NEXT_PUBLIC_CONTACT_FORM_ENDPOINT || "/api/contact";
 
 type FieldState = "idle" | "active" | "valid" | "error";
-
-const STATE_COLOR: Record<FieldState, string> = {
-  idle: "var(--asphalt-600)",
-  active: "var(--sector-purple)",
-  valid: "var(--sector-green)",
-  error: "var(--flag-red)",
+/* timing-screen colours: purple = live, green = good, red = needs a fix */
+const LINE: Record<FieldState, string> = {
+  idle: "var(--line-strong)",
+  active: "var(--purple)",
+  valid: "var(--green)",
+  error: "var(--red)",
 };
 
-const STATE_TEXT: Record<FieldState, string> = {
-  idle: "",
-  active: "Live",
-  valid: "Personal best",
-  error: "Check",
-};
-
-function Field({
-  id,
-  sector,
-  label,
-  state,
-  error,
-  children,
-}: {
-  id: string;
-  sector: string;
-  label: string;
-  state: FieldState;
-  error?: string;
-  children: ReactNode;
-}) {
+function Field({ id, n, label, state, error, children }: { id: string; n: string; label: string; state: FieldState; error?: string; children: ReactNode }) {
   return (
-    <div className="group relative">
-      <div className="mb-2 flex items-center justify-between">
-        <label htmlFor={id} className="flex items-center gap-2.5">
-          <span className="font-mono text-[11px] font-bold text-tyre-grey tabular">{sector}</span>
-          <span className="font-display text-sm font-bold tracking-[0.1em] uppercase">{label}</span>
-        </label>
-        <span className="label-mono text-[10px] transition-colors duration-300" style={{ color: STATE_COLOR[state] }} aria-hidden>
-          {STATE_TEXT[state]}
-        </span>
-      </div>
-      <div className="relative">
-        <span
-          aria-hidden
-          className="absolute inset-y-0 left-0 z-10 w-[3px] rounded-l-[4px] transition-colors duration-300"
-          style={{ background: STATE_COLOR[state] }}
-        />
-        {children}
-      </div>
+    <div className="relative">
+      <label htmlFor={id} className="flex items-baseline gap-3">
+        <span className="font-mono text-[11px] text-muted tabular">{n}</span>
+        <span className="eyebrow !text-fg">{label}</span>
+      </label>
+      {children}
+      <span aria-hidden className="absolute inset-x-0 bottom-0 h-px bg-line-strong" />
+      <motion.span
+        aria-hidden
+        className="absolute inset-x-0 bottom-0 h-px origin-left"
+        animate={{ scaleX: state === "idle" ? 0 : 1, backgroundColor: LINE[state] }}
+        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+      />
       {error && (
-        <motion.p
-          id={`${id}-error`}
-          initial={{ opacity: 0, y: -4 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mt-2 flex items-center gap-2 text-sm text-[#fca5a5]"
-          role="alert"
-        >
-          <span aria-hidden className="h-2.5 w-3 rounded-[1px] bg-flag-red" />
+        <motion.p id={`${id}-error`} initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} role="alert" className="absolute -bottom-7 left-0 text-sm text-[#fca5a5]">
           {error}
         </motion.p>
       )}
@@ -80,7 +48,7 @@ function Field({
 }
 
 const inputCls =
-  "w-full rounded-[4px] border border-asphalt-700 bg-asphalt-950/70 py-3 pr-4 pl-5 text-[15px] text-kerb placeholder:text-tyre-grey/60 transition-[border-color,background-color] duration-300 outline-none hover:border-asphalt-600 focus:border-purple/70 focus:bg-asphalt-950";
+  "mt-3 block w-full bg-transparent pb-4 text-[clamp(20px,2vw,28px)] tracking-[-0.02em] text-fg placeholder:text-fg/25 outline-none";
 
 export function ContactForm({ shortName }: { shortName: string }) {
   const showFlag = useFlag();
@@ -89,14 +57,14 @@ export function ContactForm({ shortName }: { shortName: string }) {
     register,
     handleSubmit,
     reset,
-    formState: { errors, isSubmitting, dirtyFields, touchedFields, isSubmitted },
     watch,
+    formState: { errors, isSubmitting, dirtyFields, touchedFields, isSubmitted },
   } = useForm<ContactInput>({
     resolver: zodResolver(contactSchema),
     mode: "onTouched",
     defaultValues: { name: "", email: "", subject: "Box box", message: "", website: "" },
   });
-
+  const subject = watch("subject");
   const message = watch("message") ?? "";
 
   const stateOf = (name: keyof ContactInput): FieldState => {
@@ -107,15 +75,13 @@ export function ContactForm({ shortName }: { shortName: string }) {
   };
 
   const onSubmit = async (data: ContactInput) => {
-    if (data.website) return; // bot
+    if (data.website) return;
     try {
-      const last = Number(localStorage.getItem(COOLDOWN_KEY) ?? 0);
-      if (Date.now() - last < COOLDOWN_MS) {
-        showFlag({ type: "yellow", title: "Yellow flag", message: "Message just sent. Give it a minute before the next one." });
+      if (Date.now() - Number(localStorage.getItem(COOLDOWN_KEY) ?? 0) < COOLDOWN_MS) {
+        showFlag({ type: "yellow", title: "Message just sent", message: "Give it a minute before the next one." });
         return;
       }
     } catch {}
-
     try {
       const res = await fetch(ENDPOINT, {
         method: "POST",
@@ -129,67 +95,38 @@ export function ContactForm({ shortName }: { shortName: string }) {
       reset();
       showFlag({ type: "green", title: "Copy that, message received.", message: `${shortName} will be back on the radio soon.` });
     } catch {
-      showFlag({ type: "red", title: "Red flag: transmission failed", message: "Please try again, or use one of the radio channels." });
+      showFlag({ type: "red", title: "Transmission failed", message: "Please try again, or email directly." });
     }
   };
 
-  const focusProps = (name: keyof ContactInput) => ({
-    onFocus: () => setFocused(name),
-    onBlur: () => setFocused(null),
-  });
-
-  const nameReg = register("name");
-  const emailReg = register("email");
-  const msgReg = register("message");
+  const bind = (name: "name" | "email" | "message") => {
+    const r = register(name);
+    return {
+      ...r,
+      onFocus: () => setFocused(name),
+      onBlur: (e: React.FocusEvent<HTMLInputElement & HTMLTextAreaElement>) => {
+        r.onBlur(e);
+        setFocused(null);
+      },
+      "aria-invalid": !!errors[name],
+      "aria-describedby": errors[name] ? `${name}-error` : undefined,
+    };
+  };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} noValidate className="grid gap-6">
-      <div className="grid gap-6 sm:grid-cols-2">
-        <Field id="name" sector="S1" label="Name" state={stateOf("name")} error={errors.name?.message}>
-          <input
-            id="name"
-            autoComplete="name"
-            placeholder="Your name"
-            aria-invalid={!!errors.name}
-            aria-describedby={errors.name ? "name-error" : undefined}
-            className={inputCls}
-            {...nameReg}
-            onFocus={focusProps("name").onFocus}
-            onBlur={(e) => {
-              nameReg.onBlur(e);
-              setFocused(null);
-            }}
-          />
-        </Field>
-        <Field id="email" sector="S2" label="Email" state={stateOf("email")} error={errors.email?.message}>
-          <input
-            id="email"
-            type="email"
-            autoComplete="email"
-            placeholder="you@example.com"
-            aria-invalid={!!errors.email}
-            aria-describedby={errors.email ? "email-error" : undefined}
-            className={inputCls}
-            {...emailReg}
-            onFocus={focusProps("email").onFocus}
-            onBlur={(e) => {
-              emailReg.onBlur(e);
-              setFocused(null);
-            }}
-          />
-        </Field>
-      </div>
-
+    <form onSubmit={handleSubmit(onSubmit)} noValidate className="grid gap-14">
       <fieldset>
-        <legend className="mb-3 flex items-center gap-2.5">
-          <span className="font-mono text-[11px] font-bold text-tyre-grey tabular">S3</span>
-          <span className="font-display text-sm font-bold tracking-[0.1em] uppercase">Channel</span>
-        </legend>
-        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+        <legend className="eyebrow mb-5 !text-fg">Channel</legend>
+        <div className="flex flex-wrap gap-2">
           {SUBJECTS.map((s) => (
             <label key={s} className="relative cursor-pointer">
               <input type="radio" value={s} className="peer sr-only" {...register("subject")} />
-              <span className="flex h-11 items-center justify-center rounded-[4px] border border-asphalt-700 bg-asphalt-950/70 px-3 text-center font-display text-[13px] font-bold tracking-[0.08em] text-kerb/75 uppercase transition-all duration-300 peer-checked:border-livery peer-checked:bg-livery-soft peer-checked:text-kerb peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-livery-ink hover:border-asphalt-600 hover:text-kerb">
+              <span
+                className={cn(
+                  "flex h-11 items-center rounded-full border px-5 text-sm transition-colors duration-300 peer-focus-visible:outline-1 peer-focus-visible:outline-offset-4 peer-focus-visible:outline-livery-ink",
+                  subject === s ? "border-fg bg-fg text-ink-950" : "border-line-strong text-fg/80 hover:border-fg/50 hover:text-fg",
+                )}
+              >
                 {s}
               </span>
             </label>
@@ -197,54 +134,45 @@ export function ContactForm({ shortName }: { shortName: string }) {
         </div>
       </fieldset>
 
-      <Field id="message" sector="S4" label="Message" state={stateOf("message")} error={errors.message?.message}>
-        <textarea
-          id="message"
-          rows={6}
-          placeholder="What are we racing towards?"
-          aria-invalid={!!errors.message}
-          aria-describedby={errors.message ? "message-error" : "message-count"}
-          className={cn(inputCls, "resize-y")}
-          {...msgReg}
-          onFocus={focusProps("message").onFocus}
-          onBlur={(e) => {
-            msgReg.onBlur(e);
-            setFocused(null);
-          }}
-        />
-        <span id="message-count" className="label-mono pointer-events-none absolute right-3 bottom-3 text-[10px] text-tyre-grey tabular">
+      <div className="grid gap-14 md:grid-cols-2">
+        <Field id="name" n="01" label="Name" state={stateOf("name")} error={errors.name?.message}>
+          <input id="name" autoComplete="name" placeholder="Your name" className={inputCls} {...bind("name")} />
+        </Field>
+        <Field id="email" n="02" label="Email" state={stateOf("email")} error={errors.email?.message}>
+          <input id="email" type="email" autoComplete="email" placeholder="you@company.com" className={inputCls} {...bind("email")} />
+        </Field>
+      </div>
+
+      <Field id="message" n="03" label="Message" state={stateOf("message")} error={errors.message?.message}>
+        <textarea id="message" rows={4} placeholder="What are we racing towards?" className={cn(inputCls, "resize-none")} {...bind("message")} />
+        <span className="pointer-events-none absolute right-0 bottom-4 font-mono text-[11px] text-muted tabular" aria-hidden>
           {message.length}/2000
         </span>
       </Field>
 
-      {/* honeypot */}
       <div aria-hidden className="absolute -left-[9999px] h-px w-px overflow-hidden">
         <label htmlFor="website">Website</label>
         <input id="website" tabIndex={-1} autoComplete="off" {...register("website")} />
       </div>
 
-      <div className="flex flex-wrap items-center justify-between gap-4 pt-2">
-        <p className="text-xs text-tyre-grey">Purple: editing · Green: looks good · Red: needs a fix</p>
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className="btn-drs group relative inline-flex h-12 items-center rounded-[4px] bg-livery px-7 font-display text-[15px] font-bold tracking-[0.08em] text-white uppercase shadow-[0_10px_40px_-12px_var(--livery-glow)] disabled:opacity-70"
-        >
-          <span className="unskew-speed flex items-center gap-2.5">
-            {isSubmitting ? (
-              <>
-                Transmitting <Loader2 size={16} className="animate-spin" aria-hidden />
-              </>
-            ) : (
-              <>
-                Send radio message <Send size={16} className="btn-arrow" aria-hidden />
-              </>
-            )}
-          </span>
-          <span aria-hidden className="drs-flap absolute -top-2.5 right-3 rounded-[2px] bg-drs px-1.5 py-[3px] font-mono text-[9px] leading-none font-bold tracking-[0.15em] text-asphalt-950">
-            DRS
-          </span>
-        </button>
+      <div className="flex flex-wrap items-center justify-between gap-6 pt-2">
+        <p className="text-xs text-muted">Purple: editing · Green: looks good · Red: needs a fix</p>
+        <Magnetic strength={0.25}>
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="group relative inline-flex h-14 items-center gap-3 overflow-hidden rounded-full bg-fg pr-2 pl-7 text-[15px] font-medium text-ink-950 disabled:opacity-70"
+          >
+            <span aria-hidden className="absolute inset-0 translate-y-full rounded-full bg-livery transition-transform duration-500 ease-out group-hover:translate-y-0" />
+            <span className="roll relative group-hover:text-white">
+              <span>{isSubmitting ? "Transmitting" : "Send radio message"}</span>
+              <span aria-hidden>{isSubmitting ? "Transmitting" : "Send radio message"}</span>
+            </span>
+            <span aria-hidden className="relative flex size-10 items-center justify-center rounded-full bg-ink-950 text-fg transition-transform duration-500 ease-out group-hover:rotate-45">
+              {isSubmitting ? <Loader2 size={17} className="animate-spin" /> : <ArrowUpRight size={17} />}
+            </span>
+          </button>
+        </Magnetic>
       </div>
     </form>
   );

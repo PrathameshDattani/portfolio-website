@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-/** Ticking local clock for the owner's timezone. Rendered only after mount (no hydration mismatch). */
+/** Ticking local clock for the owner's timezone. Renders after mount (no hydration mismatch). */
 export function LocalClock({ timezone }: { timezone: string }) {
   const [now, setNow] = useState<Date | null>(null);
   useEffect(() => {
@@ -15,24 +15,17 @@ export function LocalClock({ timezone }: { timezone: string }) {
   let time: string;
   let zone = timezone;
   try {
-    time = new Intl.DateTimeFormat("en-GB", {
-      timeZone: timezone,
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-      hour12: false,
-    }).format(now);
+    time = new Intl.DateTimeFormat("en-GB", { timeZone: timezone, hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false }).format(now);
     zone =
-      new Intl.DateTimeFormat("en-US", { timeZone: timezone, timeZoneName: "short" })
-        .formatToParts(now)
-        .find((p) => p.type === "timeZoneName")?.value ?? timezone;
+      new Intl.DateTimeFormat("en-US", { timeZone: timezone, timeZoneName: "short" }).formatToParts(now).find((p) => p.type === "timeZoneName")?.value ??
+      timezone;
   } catch {
     time = now.toLocaleTimeString();
   }
   return (
     <span>
       {time}
-      <span className="ml-2 text-xs text-tyre-grey">{zone}</span>
+      <span className="ml-2 text-muted">{zone}</span>
     </span>
   );
 }

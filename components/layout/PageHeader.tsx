@@ -1,31 +1,57 @@
 import type { ReactNode } from "react";
-import { SectionHeader } from "@/components/f1/SectionHeader";
+import { SplitReveal } from "@/components/motion/SplitReveal";
+import { Reveal, Rule } from "@/components/ui/Reveal";
 
-/** Standard top-of-page header with grid backdrop and livery glow. */
+/** Editorial page opener: index + label, oversized title, intro copy, drawn rule. */
 export function PageHeader({
-  sector,
+  index,
+  label,
   plain,
   title,
-  subtitle,
-  children,
+  intro,
+  aside,
 }: {
-  sector: string;
+  index: string;
+  label: string;
   plain: string;
-  title: ReactNode;
-  subtitle?: ReactNode;
-  children?: ReactNode;
+  title: string;
+  intro?: ReactNode;
+  aside?: ReactNode;
 }) {
   return (
-    <section className="relative isolate overflow-hidden pt-[calc(var(--nav-h)+64px)] pb-14 lg:pt-[calc(var(--nav-h)+96px)] lg:pb-20">
-      <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
-        <div className="grid-lines absolute inset-0 [mask-image:radial-gradient(ellipse_70%_80%_at_30%_0%,black,transparent)]" />
-        <div className="absolute -top-40 -left-20 h-[420px] w-[620px] rounded-full bg-[radial-gradient(closest-side,var(--livery-glow),transparent)] opacity-30 blur-3xl" />
-      </div>
-      <div className="container-race">
-        <SectionHeader as="h1" sector={sector} plain={plain} title={title} subtitle={subtitle}>
-          {children}
-        </SectionHeader>
-      </div>
+    <section className="wrap pt-[calc(var(--nav-h)+clamp(56px,10vw,140px))] pb-[clamp(48px,7vw,96px)]">
+      <Reveal className="flex items-center gap-3" y={12}>
+        <span className="eyebrow !text-livery-ink">({index})</span>
+        <span className="eyebrow">
+          {label} — {plain}
+        </span>
+      </Reveal>
+      <SplitReveal as="h1" text={title} className="display mt-6 text-[clamp(52px,11vw,180px)] font-[750]" duration={1.25} />
+      <Rule className="mt-[clamp(32px,5vw,64px)]" delay={0.3} />
+      {(intro || aside) && (
+        <div className="mt-8 grid gap-8 md:grid-cols-12">
+          {intro && (
+            <Reveal delay={0.35} className="md:col-span-6 md:col-start-7">
+              <div className="max-w-xl text-[17px] leading-relaxed text-fg/80">{intro}</div>
+            </Reveal>
+          )}
+          {aside && (
+            <Reveal delay={0.25} className="md:col-span-5 md:row-start-1">
+              {aside}
+            </Reveal>
+          )}
+        </div>
+      )}
     </section>
+  );
+}
+
+/** Section opener used inside pages. */
+export function SectionLabel({ index, children, className }: { index: string; children: ReactNode; className?: string }) {
+  return (
+    <Reveal y={12} className={`flex items-center gap-3 ${className ?? ""}`}>
+      <span className="eyebrow !text-livery-ink">({index})</span>
+      <span className="eyebrow">{children}</span>
+    </Reveal>
   );
 }

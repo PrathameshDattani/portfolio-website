@@ -6,14 +6,12 @@ import { EASE } from "@/lib/motion";
 
 const TRIGGER = "boxbox";
 
-function formatTime(ms: number) {
-  const total = ms / 1000;
-  const m = Math.floor(total / 60);
-  const s = (total % 60).toFixed(3).padStart(6, "0");
-  return `${m}:${s}`;
+function format(ms: number) {
+  const s = ms / 1000;
+  return `${Math.floor(s / 60)}:${(s % 60).toFixed(3).padStart(6, "0")}`;
 }
 
-/** Type "box box" anywhere (outside form fields) for a pit stop. */
+/** Type "box box" anywhere (outside form fields): a pit-stop timer shows the time since page load. */
 export function EasterEgg() {
   const [open, setOpen] = useState(false);
   const [elapsed, setElapsed] = useState(0);
@@ -37,7 +35,7 @@ export function EasterEgg() {
 
   useEffect(() => {
     if (!open) return;
-    const close = window.setTimeout(() => setOpen(false), 4200);
+    const close = window.setTimeout(() => setOpen(false), 4000);
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
     window.addEventListener("keydown", onKey);
     return () => {
@@ -52,66 +50,25 @@ export function EasterEgg() {
         <motion.div
           role="status"
           aria-live="assertive"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.3 }}
           onClick={() => setOpen(false)}
-          className="fixed inset-0 z-[90] grid place-items-center bg-asphalt-950/85 backdrop-blur-sm"
+          className="fixed inset-0 z-[115] flex flex-col items-center justify-center bg-ink-950/90 backdrop-blur-md"
+          initial={{ clipPath: "inset(100% 0 0 0)" }}
+          animate={{ clipPath: "inset(0% 0 0 0)" }}
+          exit={{ clipPath: "inset(0 0 100% 0)" }}
+          transition={{ duration: 0.8, ease: [0.76, 0, 0.24, 1] }}
         >
-          <div className="flex flex-col items-center gap-8 px-6 text-center">
-            <p className="label-mono text-livery-ink">Team radio</p>
-            <p className="font-display text-5xl font-black italic tracking-wider uppercase sm:text-7xl">
-              Box, box!
-            </p>
-
-            {/* Top-down pit stop: car slides in, four wheel guns spin */}
-            <svg viewBox="0 0 320 140" className="w-[min(420px,85vw)]" aria-hidden>
-              <rect x="0" y="62" width="320" height="16" fill="var(--asphalt-800)" />
-              <line x1="0" y1="70" x2="320" y2="70" stroke="var(--sector-yellow)" strokeDasharray="10 8" />
-              <motion.g
-                initial={{ x: -260 }}
-                animate={{ x: 0 }}
-                transition={{ duration: 0.7, ease: EASE }}
-              >
-                <rect x="110" y="56" width="110" height="28" rx="10" fill="var(--livery)" />
-                <rect x="150" y="62" width="30" height="16" rx="6" fill="var(--asphalt-950)" />
-                <rect x="214" y="50" width="14" height="40" rx="2" fill="var(--asphalt-700)" />
-                <rect x="100" y="52" width="10" height="36" rx="2" fill="var(--asphalt-700)" />
-                {[
-                  [124, 40],
-                  [124, 88],
-                  [196, 40],
-                  [196, 88],
-                ].map(([x, y], i) => (
-                  <g key={i}>
-                    <rect x={x} y={y} width="20" height="12" rx="3" fill="#000" />
-                    <motion.circle
-                      cx={(x ?? 0) + 10}
-                      cy={(y ?? 0) + (i % 2 ? 22 : -10)}
-                      r="5"
-                      fill="none"
-                      stroke="var(--drs-cyan)"
-                      strokeWidth="2"
-                      strokeDasharray="6 4"
-                      initial={{ rotate: 0, opacity: 0 }}
-                      animate={{ rotate: 720, opacity: [0, 1, 1, 0] }}
-                      transition={{ delay: 0.75 + i * 0.05, duration: 1.4, ease: "linear" }}
-                      style={{ originX: "50%", originY: "50%" }}
-                    />
-                  </g>
-                ))}
-              </motion.g>
-            </svg>
-
-            <div className="flex flex-col items-center gap-2">
-              <p className="label-mono text-tyre-grey">Pit stop time (since page load)</p>
-              <p className="font-mono text-4xl font-bold text-green tabular sm:text-5xl">
-                {formatTime(elapsed)}
-              </p>
-            </div>
-            <p className="label-mono text-tyre-grey">Click or press Esc to rejoin</p>
+          <p className="eyebrow">Team radio · Box, box</p>
+          <div className="overflow-hidden">
+            <motion.p
+              className="display mt-6 text-[clamp(56px,13vw,200px)] font-[300] tabular"
+              initial={{ y: "100%" }}
+              animate={{ y: "0%" }}
+              transition={{ duration: 1, ease: EASE, delay: 0.3 }}
+            >
+              {format(elapsed)}
+            </motion.p>
           </div>
+          <p className="eyebrow mt-6">Pit stop time · since lights out on this page</p>
         </motion.div>
       )}
     </AnimatePresence>

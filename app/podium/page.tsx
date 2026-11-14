@@ -1,11 +1,8 @@
-import { ArrowUpRight, Award, FileText, Medal, Trophy } from "lucide-react";
 import type { Metadata } from "next";
 import { achievements } from "@/content/achievements";
 import { publications } from "@/content/publications";
-import { LiveryCard } from "@/components/f1/LiveryCard";
-import { SectionHeader } from "@/components/f1/SectionHeader";
-import { PageHeader } from "@/components/layout/PageHeader";
-import { Podium } from "@/components/podium/Podium";
+import { PageHeader, SectionLabel } from "@/components/layout/PageHeader";
+import { TrophyCard } from "@/components/podium/TrophyCard";
 import { Reveal } from "@/components/ui/Reveal";
 import { formatMonth, pad } from "@/lib/utils";
 
@@ -14,119 +11,108 @@ export const metadata: Metadata = {
   description: "Hackathons, certifications, scholarships and publications.",
 };
 
-const POS_STYLE = {
-  P1: { color: "var(--livery)", icon: Trophy, label: "P1 · Winner" },
-  P2: { color: "#C9CBD1", icon: Trophy, label: "P2 · Runner-up" },
-  P3: { color: "#C7884A", icon: Trophy, label: "P3 · Third" },
-  Finisher: { color: "var(--sector-green)", icon: Medal, label: "Finisher" },
+/* Brushed metals for the numerals */
+const METAL = {
+  P1: "linear-gradient(180deg,#fff6d8 0%,#e9c46a 30%,#8a6420 52%,#f3d98c 70%,#a77a26 100%)",
+  P2: "linear-gradient(180deg,#ffffff 0%,#d4d6db 32%,#6f737b 52%,#e2e4e8 70%,#8d9199 100%)",
+  P3: "linear-gradient(180deg,#ffe2c8 0%,#d08a52 32%,#6b3a17 52%,#e1a272 70%,#8f5428 100%)",
 } as const;
 
 export default function PodiumPage() {
-  const featured = achievements.filter((a) => a.featured).slice(0, 3);
+  const top = (["P2", "P1", "P3"] as const)
+    .map((p) => ({ p, a: achievements.find((x) => x.featured && x.position === p) }))
+    .filter((x) => x.a);
+
   return (
     <>
       <PageHeader
-        sector="Trophy cabinet"
+        index="05"
+        label="Trophy cabinet"
         plain="Achievements"
-        title={
-          <>
-            The <span className="text-livery">podium</span>
-          </>
-        }
-        subtitle="Silverware from hackathons, certifications, scholarships and more."
+        title="Podium"
+        intro="Silverware from hackathons, certifications and scholarships, plus the papers filed as technical regulations."
       />
 
-      {featured.length > 0 && (
-        <section className="container-race" aria-label="Top three">
-          <div className="relative overflow-hidden rounded-md border border-asphalt-800 bg-gradient-to-b from-asphalt-950 to-asphalt-900 px-4 pt-16 sm:px-10">
-            <div aria-hidden className="absolute inset-0 bg-[radial-gradient(ellipse_50%_60%_at_50%_100%,var(--livery-glow),transparent)] opacity-40" />
-            <div className="relative">
-              <Podium items={featured} />
-            </div>
-          </div>
+      {top.length > 0 && (
+        <section className="wrap" aria-label="Top three">
+          <ol className="grid items-end gap-5 md:grid-cols-3">
+            {top.map(({ p, a }, i) => (
+              <Reveal as="li" key={p} delay={[0.15, 0, 0.3][i]} className={p === "P1" ? "md:-mb-0" : "md:mb-0"}>
+                <TrophyCard
+                  className={`relative flex flex-col overflow-hidden rounded-[6px] border border-line bg-[linear-gradient(180deg,#141417,#0a0a0c)] p-8 ${p === "P1" ? "md:min-h-[520px]" : p === "P2" ? "md:min-h-[440px]" : "md:min-h-[380px]"}`}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="eyebrow">{formatMonth(a!.date)}</span>
+                    <span className="eyebrow">{p === "P1" ? "Winner" : p === "P2" ? "Runner-up" : "Third"}</span>
+                  </div>
+                  <span
+                    className="display mt-auto block bg-clip-text pt-10 text-[clamp(110px,13vw,200px)] font-[800] text-transparent"
+                    style={{ backgroundImage: METAL[p] }}
+                  >
+                    {p}
+                  </span>
+                  <h2 className="display-narrow mt-6 text-2xl font-[600]">{a!.event}</h2>
+                  <p className="mt-2 text-sm text-muted">{a!.description ?? a!.title}</p>
+                </TrophyCard>
+              </Reveal>
+            ))}
+          </ol>
         </section>
       )}
 
-      <section className="section-y container-race" aria-labelledby="cabinet">
-        <SectionHeader
-          sector="Results"
-          plain="All achievements"
-          title={<span id="cabinet">Full results</span>}
-        />
-        <ul className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {achievements.map((a, i) => {
-            const st = POS_STYLE[a.position ?? "Finisher"];
-            const Icon = st.icon;
-            return (
-              <Reveal as="li" key={a.title} delay={(i % 3) * 0.08}>
-                <LiveryCard color={st.color} className="flex h-full flex-col p-6">
-                  <div className="flex items-start justify-between">
-                    <span
-                      className="flex size-11 items-center justify-center rounded-full border"
-                      style={{ borderColor: st.color, color: st.color }}
-                    >
-                      <Icon size={20} aria-hidden />
-                    </span>
-                    <span className="label-mono text-tyre-grey">{formatMonth(a.date)}</span>
-                  </div>
-                  <p className="label-mono mt-6" style={{ color: st.color }}>
-                    {st.label}
-                  </p>
-                  <h3 className="mt-2 text-xl leading-tight font-bold">{a.event} Grand Prix</h3>
-                  <p className="mt-1 text-sm text-kerb/80">{a.title}</p>
-                  {a.description && <p className="mt-3 text-sm text-tyre-grey">{a.description}</p>}
+      <section className="wrap section-y" aria-labelledby="results">
+        <SectionLabel index="—">Full results</SectionLabel>
+        <h2 id="results" className="sr-only">
+          Full results
+        </h2>
+        <ol className="mt-10 border-t border-line">
+          {achievements.map((a, i) => (
+            <Reveal as="li" key={a.title} delay={Math.min(i, 6) * 0.05}>
+              <div className="group relative grid grid-cols-12 items-baseline gap-4 border-b border-line py-7">
+                <span className="col-span-2 font-mono text-sm tabular md:col-span-1">{a.position ?? "—"}</span>
+                <span className="col-span-10 md:col-span-6">
+                  <span className="display-narrow block text-[clamp(20px,2.2vw,30px)] font-[600]">{a.event}</span>
+                  <span className="mt-1 block text-sm text-muted">{a.title}</span>
+                </span>
+                <span className="col-span-8 col-start-3 text-sm text-muted md:col-span-3 md:col-start-auto">{a.description}</span>
+                <span className="col-span-2 flex justify-end gap-4 text-sm md:col-span-2">
+                  <span className="font-mono text-muted tabular">{formatMonth(a.date)}</span>
                   {a.link && (
-                    <a
-                      href={a.link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="stretched-link label-mono mt-auto inline-flex items-center gap-1.5 pt-6 text-kerb/80 transition-colors hover:text-kerb"
-                    >
-                      View proof <ArrowUpRight size={13} aria-hidden />
-                      <span className="sr-only"> for {a.title}</span>
+                    <a href={a.link} target="_blank" rel="noopener noreferrer" className="after:absolute after:inset-0">
+                      ↗<span className="sr-only">View proof for {a.title}</span>
                     </a>
                   )}
-                </LiveryCard>
-              </Reveal>
-            );
-          })}
-        </ul>
+                </span>
+              </div>
+            </Reveal>
+          ))}
+        </ol>
       </section>
 
       {publications.length > 0 && (
-        <section className="container-race pb-12" aria-labelledby="regs">
-          <SectionHeader
-            sector="Technical regulations"
-            plain="Publications"
-            title={<span id="regs">Technical regulations</span>}
-            subtitle="Papers and articles, filed like rulebook articles."
-          />
-          <ol className="mt-12 grid gap-4">
+        <section className="wrap pb-[clamp(96px,12vw,180px)]" aria-labelledby="regs">
+          <SectionLabel index="—">Technical regulations — Publications</SectionLabel>
+          <h2 id="regs" className="sr-only">
+            Publications
+          </h2>
+          <ol className="mt-10 border-t border-line">
             {publications.map((p, i) => (
-              <Reveal as="li" key={p.title} delay={i * 0.06}>
-                <article className="group relative grid gap-4 rounded-md border border-asphalt-700 bg-asphalt-900/70 p-6 transition-colors duration-300 hover:border-asphalt-600 sm:grid-cols-[140px_1fr_auto] sm:items-center">
-                  <span className="label-mono text-livery-ink">Article {pad(i + 1, 1)}.1</span>
-                  <div>
-                    <h3 className="text-lg leading-snug font-bold normal-case tracking-normal sm:text-xl">{p.title}</h3>
-                    <p className="mt-1 text-sm text-tyre-grey">
-                      {p.authors ? `${p.authors} · ` : ""}
-                      {p.venue} · {p.date}
-                    </p>
-                  </div>
-                  {p.link ? (
-                    <a
-                      href={p.link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="stretched-link label-mono inline-flex items-center gap-2 text-kerb/80 transition-colors group-hover:text-kerb"
-                    >
-                      <FileText size={14} aria-hidden /> Read
-                      <span className="sr-only"> {p.title}</span>
-                    </a>
-                  ) : (
-                    <Award size={18} className="text-tyre-grey" aria-hidden />
-                  )}
-                </article>
+              <Reveal as="li" key={p.title} delay={i * 0.05}>
+                <a
+                  href={p.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-cursor="Read"
+                  className="group grid gap-3 border-b border-line py-8 md:grid-cols-12"
+                >
+                  <span className="eyebrow !text-livery-ink md:col-span-2">Art. {pad(i + 1)}.1</span>
+                  <span className="text-[clamp(20px,2vw,28px)] leading-snug tracking-[-0.02em] md:col-span-7">
+                    <span className="u-draw">{p.title}</span>
+                  </span>
+                  <span className="text-sm text-muted md:col-span-3 md:text-right">
+                    {p.venue} · {p.date}
+                  </span>
+                </a>
               </Reveal>
             ))}
           </ol>

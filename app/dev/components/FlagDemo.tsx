@@ -11,7 +11,7 @@ export function FlagDemo() {
           key={t}
           type="button"
           onClick={() => showFlag({ type: t, title: `${t} flag`, message: "Sample flag banner." })}
-          className="label-mono rounded-[3px] border border-asphalt-700 px-3 py-2 hover:border-kerb/50"
+          className="eyebrow rounded-full border border-line-strong px-4 py-2 hover:border-fg/50"
         >
           {t}
         </button>

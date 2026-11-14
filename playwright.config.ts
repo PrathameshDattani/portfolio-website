@@ -8,7 +8,7 @@ export default defineConfig({
   use: { baseURL: `http://localhost:${PORT}` },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
   webServer: {
-    command: `pnpm start -p ${PORT}`,
+    command: `npx next start -p ${PORT}`,
     port: PORT,
     reuseExistingServer: true,
     timeout: 120_000,

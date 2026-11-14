@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, JetBrains_Mono, Titillium_Web } from "next/font/google";
+import { Archivo, Geist, Geist_Mono } from "next/font/google";
 import Script from "next/script";
 import type { CSSProperties, ReactNode } from "react";
 import { profile } from "@/content/profile";
@@ -11,20 +11,15 @@ import { NavBar } from "@/components/layout/NavBar";
 import { Providers } from "@/components/layout/Providers";
 import "./globals.css";
 
-const display = Titillium_Web({
+const display = Archivo({
   subsets: ["latin"],
-  weight: ["400", "600", "700", "900"],
-  style: ["normal", "italic"],
-  variable: "--font-titillium",
+  weight: "variable",
+  axes: ["wdth"],
+  variable: "--font-archivo",
   display: "swap",
 });
-const sans = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
-const mono = JetBrains_Mono({
-  subsets: ["latin"],
-  weight: ["400", "500", "700"],
-  variable: "--font-jetbrains",
-  display: "swap",
-});
+const sans = Geist({ subsets: ["latin"], variable: "--font-geist", display: "swap" });
+const mono = Geist_Mono({ subsets: ["latin"], variable: "--font-geist-mono", display: "swap" });
 
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
@@ -44,13 +39,7 @@ export const metadata: Metadata = {
   twitter: { card: "summary_large_image" },
 };
 
-export const viewport: Viewport = {
-  themeColor: "#0A0A0B",
-  colorScheme: "dark",
-};
-
-// Runs before paint: hide the start-lights overlay if already seen this session (no flash).
-const introScript = `try{if(sessionStorage.getItem('lights-out')==='1'||matchMedia('(prefers-reduced-motion: reduce)').matches)document.documentElement.classList.add('intro-seen')}catch(e){}`;
+export const viewport: Viewport = { themeColor: "#060607", colorScheme: "dark" };
 
 const jsonLd = {
   "@context": "https://schema.org",
@@ -61,9 +50,7 @@ const jsonLd = {
   url: site.url,
   email: `mailto:${socials.email}`,
   address: { "@type": "PostalAddress", addressLocality: profile.location },
-  sameAs: [socials.github, socials.linkedin, socials.x, ...(socials.other ?? []).map((o) => o.href)].filter(
-    Boolean,
-  ),
+  sameAs: [socials.github, socials.linkedin, socials.x, ...(socials.other ?? []).map((o) => o.href)].filter(Boolean),
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
@@ -75,19 +62,15 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       suppressHydrationWarning
     >
       <head>
-        <script dangerouslySetInnerHTML={{ __html: introScript }} />
         <noscript>
-          <style>{`.start-lights{display:none!important}[style*="opacity:0"]{opacity:1!important;transform:none!important}`}</style>
+          <style>{`[style*="opacity:0"]{opacity:1!important;transform:none!important}`}</style>
         </noscript>
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-        />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       </head>
       <body>
         <a
           href="#main"
-          className="label-mono fixed top-3 left-3 z-[200] -translate-y-20 rounded-[3px] bg-livery px-4 py-3 text-white transition-transform focus:translate-y-0"
+          className="eyebrow fixed top-3 left-3 z-[200] -translate-y-20 rounded-full bg-fg px-4 py-3 !text-ink-950 transition-transform focus:translate-y-0"
         >
           Skip to content
         </a>
@@ -100,12 +83,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         </Providers>
         <div aria-hidden className="grain" />
         {site.analyticsId && (
-          <Script
-            defer
-            data-domain={site.analyticsId}
-            src="https://plausible.io/js/script.js"
-            strategy="afterInteractive"
-          />
+          <Script defer data-domain={site.analyticsId} src="https://plausible.io/js/script.js" strategy="afterInteractive" />
         )}
       </body>
     </html>

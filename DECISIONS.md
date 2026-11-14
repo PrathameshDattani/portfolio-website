@@ -1,32 +1,26 @@
 # Design & build decisions
 
-Decisions not fully specified in `plan.md`, made to fit "premium broadcast telemetry".
+## Direction: "Night race, cinematic" (v2 redesign)
+The first build leaned on literal F1 decoration: skewed labels, DRS tags, tyre badges, typing radio bubbles, gauges and cartoon SVGs. It read as gimmicky. v2 keeps the race-weekend metaphor in the copy and in a few signature moments, and otherwise follows editorial / award-site conventions:
 
-## Design
-- **Display font: Titillium Web** (over Orbitron). Wide and technical without the sci-fi feel; it also has true italics for the speed-skewed headings.
-- **Body: Inter. Data: JetBrains Mono** with tabular numerals everywhere numbers change.
-- **`--livery-ink`**: a lighter, mixed version of the livery colour used for *small* text. Pure `#E10600` on near-black falls below 4.5:1 contrast, so it is only used for large text, fills and accents.
-- **Film grain** overlay at 3.5% opacity adds depth to the flat dark surfaces. It is hidden under reduced motion.
-- **Podium colours**: P2 and P3 use neutral silver (`#C9CBD1`) and bronze (`#C7884A`). The plan's palette had no tokens for them.
-- **Proficiency colours** follow timing-screen semantics: ≥85 purple (best), ≥65 green, otherwise yellow.
-- **Architecture diagram and gallery sections are hidden** when a project has no media, rather than showing an empty placeholder box.
-- **Status flags**: Shipped = chequered, Finished = green, In progress = yellow. The flag swatch always comes with a text label.
+- **Type:** Archivo on its variable *width* axis (`wdth 125`) for wide motorsport display type, Geist for body, Geist Mono for data and labels.
+- **Palette:** near-black, off-white and one accent (the livery colour), used sparingly. The timing colours (purple, green, yellow) only appear as small functional cues.
+- **Layout:** large type, hairline rules and generous space, with no boxed cards.
 
-## Motion
-- **Lenis smooth scrolling** (not in the plan) gives the "super smooth" feel. It is disabled under `prefers-reduced-motion`.
-- The **page wipe** reveals the new page: a dark panel trailed by livery stripes sweeps off-screen. The page wrapper only fades; it never transforms, so fixed overlays inside pages keep working.
-- The **start lights** step at 700 ms per light, followed by a random 0.5 to 1.2 s hold. A blocking inline script hides the overlay before paint when the intro was already seen this session, so there is no flash.
-- **Hero "Live timing" panel**: the car laps an original circuit generated from the driver number. Speed, gear and throttle readouts are written straight to the DOM every frame, with no React re-renders.
-- Circuit cars only animate while visible (IntersectionObserver). On cards they accelerate and brake smoothly on hover.
-- **GSAP + ScrollTrigger** are dynamically imported, and only on pages that use them (telemetry chart, seasons timeline).
+## Signature pieces
+- **Hero night track** (`components/hero/night-track.ts`): raw three.js, dynamically imported. It renders wet tarmac with floodlight pools, kerbs, taillight streaks of the cars ahead, trackside floodlights, mirrored reflections in the wet surface, plus bloom and a lens pass (chromatic aberration, vignette, grain). The scene pauses off-screen and in hidden tabs. Under reduced motion it renders one still frame.
+- **Start lights**: the gantry hangs *over the live track*. When the lights go out, the camera launches (speed ramp + FOV kick) and the name reveals. The km/h readout comes straight from the scene's speed. Plays once per session and is skippable with Esc.
+- **Aerial circuit renders** (`components/track/TrackRender.tsx`): a canvas 2D "night aerial" of each procedurally generated circuit. Mown grass, run-off, gravel on corner exits, kerbs only where curvature is high, white lines, start grid, garages, grandstands and floodlight pools. The car brakes into corners and leaves a light trail.
+- **Motion system**: masked word reveals, scroll-scrubbed statement text, magnetic buttons with a text-roll hover, a custom cursor (fine pointers only), a curtain page transition carrying the destination's name, and a marquee.
 
-## Scope
-- **Phase 6** (3D hero, sound) is not built. `enable3D` and `enableSound` stay `false`.
-- **Phase 7** (blog) is not built. `enableBlog` is `false`, and turning it on only adds the nav link. The `/paddock` route still needs the MDX pipeline.
-- **Race report MDX** (`content/races/*.mdx`) is not wired up. Race reports render from `projects.ts` fields.
-- **Contact**: the built-in `/api/contact` route validates, rate-limits (5 per 10 minutes per IP, in memory) and logs messages. Setting `NEXT_PUBLIC_CONTACT_FORM_ENDPOINT` (e.g. Formspree) sends the form there instead. The client also enforces a 60 s cooldown.
-- **`/dev/components`** showcase returns 404 in production builds.
+## Removed in v2
+GSAP, the car-schematic SVG, the helmet illustration, gauges, tyre badges, sector bars, the timing tower, radio bubbles, livery cards and skewed labels.
+
+## Scope (unchanged)
+- **Not built:** the blog (Phase 7) and sound. MDX race reports are not wired up either; reports render from `projects.ts`.
+- **3D:** the hero itself now uses WebGL (always on, lazy). The plan's optional 3D car/helmet (`enable3D`) is not built.
+- **Contact:** `/api/contact` validates, rate-limits and logs messages. Set `NEXT_PUBLIC_CONTACT_FORM_ENDPOINT` for Formspree or similar.
 
 ## Known gaps
-- **JS budget**: first-load JS is about 155 to 200 KB (gzip), above the 150 KB target. Most of it is Framer Motion. Moving to `LazyMotion` + `m` components would be the next step.
-- `next lint` is deprecated in Next 15.5, but it still works.
+- **JS budget:** first-load JS is about 155 to 200 KB gzip, mostly Framer Motion. three.js loads separately, only on the home page.
+- **No photography:** the site has no real photos yet. A real portrait (`profileImage`) and project screenshots (`media[]`) would add the most realism from here.

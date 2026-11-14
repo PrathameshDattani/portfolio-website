@@ -1,6 +1,6 @@
 # F1-themed developer portfolio
 
-A motorsport-inspired portfolio built with Next.js 15, Tailwind CSS v4, Framer Motion and GSAP. The site is a race weekend and you are the driver.
+A cinematic, motorsport-inspired portfolio built with Next.js 15, Tailwind CSS v4, Framer Motion and three.js. The site is a race weekend and you are the driver.
 
 | Route | Section |
 |---|---|

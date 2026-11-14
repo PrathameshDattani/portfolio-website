@@ -1,163 +1,113 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import { education } from "@/content/education";
 import { profile } from "@/content/profile";
 import { CountUp } from "@/components/f1/CountUp";
-import { LiveryCard } from "@/components/f1/LiveryCard";
-import { SectionHeader, SectorLabel } from "@/components/f1/SectionHeader";
-import { Helmet } from "@/components/driver/Helmet";
-import { Chip } from "@/components/ui/Chip";
-import { Reveal } from "@/components/ui/Reveal";
+import { Portrait } from "@/components/driver/Portrait";
+import { SectionLabel } from "@/components/layout/PageHeader";
+import { SplitReveal } from "@/components/motion/SplitReveal";
+import { ArrowLink } from "@/components/ui/Button";
+import { Reveal, Rule } from "@/components/ui/Reveal";
 import { pad } from "@/lib/utils";
 
-export const metadata: Metadata = {
-  title: "Driver Profile · About",
-  description: profile.bioShort,
-};
+export const metadata: Metadata = { title: "Driver Profile · About", description: profile.bioShort };
 
-const availability = {
-  open: { label: "Available", color: "var(--sector-green)" },
-  limited: { label: "Limited availability", color: "var(--sector-yellow)" },
-  closed: { label: "Not available", color: "var(--flag-red)" },
+const AVAIL = {
+  open: { label: "Available for new seats", color: "var(--green)" },
+  limited: { label: "Limited availability", color: "var(--yellow)" },
+  closed: { label: "Not available", color: "var(--red)" },
 } as const;
 
 export default function DriverPage() {
-  const avail = availability[profile.availability];
+  const avail = AVAIL[profile.availability];
   return (
     <>
-      {/* Driver card */}
-      <section className="relative isolate overflow-hidden pt-[calc(var(--nav-h)+56px)] pb-20 lg:pt-[calc(var(--nav-h)+88px)]">
-        <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
-          <div className="grid-lines absolute inset-0 [mask-image:radial-gradient(ellipse_70%_80%_at_30%_10%,black,transparent)]" />
-          <span className="text-outline absolute -top-10 right-[-3vw] font-display text-[40vw] leading-none font-black italic lg:text-[28vw]">
-            {pad(profile.driverNumber)}
-          </span>
-        </div>
-        <div className="container-race grid items-center gap-12 lg:grid-cols-12">
-          <Reveal className="lg:col-span-5">
-            <div className="relative mx-auto max-w-[420px]">
-              <div
-                className="relative overflow-hidden border border-asphalt-700 bg-asphalt-900"
-                style={{ clipPath: "polygon(0 0, 88% 0, 100% 9%, 100% 100%, 12% 100%, 0 91%)" }}
-              >
-                <div aria-hidden className="carbon absolute inset-0" />
-                <div aria-hidden className="absolute inset-0 bg-[radial-gradient(circle_at_50%_30%,var(--livery-glow),transparent_65%)] opacity-50" />
-                <div className="relative aspect-[4/5]">
-                  {profile.profileImage ? (
-                    <Image
-                      src={profile.profileImage}
-                      alt={`Portrait of ${profile.fullName}`}
-                      fill
-                      sizes="(min-width: 1024px) 420px, 90vw"
-                      className="object-cover"
-                      priority
-                    />
-                  ) : (
-                    <div className="flex h-full items-center justify-center p-10">
-                      <Helmet number={profile.driverNumber} code={profile.shortName} />
-                    </div>
-                  )}
-                  {/* visor tint band */}
-                  <div aria-hidden className="absolute inset-x-0 top-0 h-1/3 bg-gradient-to-b from-asphalt-950/70 to-transparent" />
-                </div>
-                <div className="relative flex items-center justify-between border-t border-asphalt-700 bg-asphalt-950/80 py-3 pr-6 pl-12">
-                  <span className="label-mono text-tyre-grey">Car</span>
-                  <span className="font-mono text-lg font-bold tabular">{pad(profile.driverNumber)}</span>
-                  <span className="label-mono text-tyre-grey">Code</span>
-                  <span className="font-display text-lg font-black tracking-[0.15em]">{profile.shortName}</span>
-                </div>
-              </div>
-              <div aria-hidden className="livery-stripes absolute -bottom-3 left-8 h-1.5 w-32" />
-            </div>
-          </Reveal>
+      <section className="wrap pt-[calc(var(--nav-h)+clamp(56px,10vw,140px))]">
+        <Reveal y={12} className="flex items-center gap-3">
+          <span className="eyebrow !text-livery-ink">(01)</span>
+          <span className="eyebrow">Driver profile — About</span>
+        </Reveal>
+        <SplitReveal as="h1" text={profile.fullName} className="display mt-6 text-[clamp(52px,11vw,180px)] font-[750]" duration={1.25} />
+        <Rule className="mt-[clamp(32px,5vw,64px)]" delay={0.3} />
 
-          <div className="lg:col-span-7">
-            <SectionHeader
-              as="h1"
-              sector="Driver profile"
-              plain="About me"
-              title={
-                <>
-                  {profile.fullName.split(" ").slice(0, -1).join(" ")}{" "}
-                  <span className="text-livery">{profile.fullName.split(" ").slice(-1)}</span>
-                </>
-              }
-              subtitle={profile.bioShort}
-            />
-            <Reveal delay={0.15}>
-              <dl className="mt-10 grid grid-cols-2 gap-px overflow-hidden rounded-md border border-asphalt-700 bg-asphalt-700 sm:grid-cols-4">
-                {[
-                  ["Team", profile.teamName],
-                  ["Seat", profile.roleTitle],
-                  ["Home circuit", `${profile.locationFlag} ${profile.location}`],
-                ].map(([k, v]) => (
-                  <div key={k} className="bg-asphalt-900 px-4 py-4">
-                    <dt className="label-mono text-[10px] text-tyre-grey">{k}</dt>
-                    <dd className="mt-2 font-display text-[15px] leading-tight font-bold tracking-wide uppercase">{v}</dd>
-                  </div>
-                ))}
-                <div className="bg-asphalt-900 px-4 py-4">
-                  <dt className="label-mono text-[10px] text-tyre-grey">Status</dt>
-                  <dd className="mt-2 flex items-center gap-2 font-display text-[15px] leading-tight font-bold tracking-wide uppercase">
-                    <span aria-hidden className="live-dot size-2 rounded-full" style={{ background: avail.color }} />
-                    {avail.label}
-                  </dd>
-                </div>
-              </dl>
+        <div className="mt-12 grid gap-12 lg:grid-cols-12">
+          <div className="lg:col-span-5">
+            <Portrait src={profile.profileImage} alt={`Portrait of ${profile.fullName}`} number={profile.driverNumber} />
+          </div>
+          <div className="flex flex-col lg:col-span-6 lg:col-start-7">
+            <Reveal>
+              <p className="text-[clamp(22px,2.4vw,34px)] leading-[1.2] font-medium tracking-[-0.03em]">{profile.bioShort}</p>
             </Reveal>
+            <Reveal delay={0.1}>
+              <p className="mt-8 flex items-center gap-2.5 text-sm">
+                <span aria-hidden className="pulse-soft size-2 rounded-full" style={{ background: avail.color }} />
+                {avail.label}
+              </p>
+            </Reveal>
+            <dl className="mt-auto grid grid-cols-2 border-t border-line pt-2 lg:mt-16">
+              {[
+                ["Number", pad(profile.driverNumber)],
+                ["Code", profile.shortName],
+                ["Team", profile.teamName],
+                ["Seat", profile.roleTitle],
+                ["Home circuit", `${profile.location}`],
+                ["Local time zone", profile.timezone.replace("_", " ")],
+              ].map(([k, v], i) => (
+                <Reveal key={k} delay={0.1 + i * 0.05} className="border-b border-line py-5 pr-4">
+                  <dt className="eyebrow">{k}</dt>
+                  <dd className="mt-2 text-[15px]">{v}</dd>
+                </Reveal>
+              ))}
+            </dl>
           </div>
         </div>
       </section>
 
       {/* Driver stats */}
-      <section className="container-race" aria-labelledby="stats">
-        <Reveal className="overflow-hidden rounded-md border border-asphalt-700 bg-asphalt-900">
-          <div className="flex items-center justify-between border-b border-asphalt-700 bg-asphalt-800/60 px-5 py-3.5">
-            <h2 id="stats" className="label-mono font-bold text-kerb">
-              Driver stats
-            </h2>
-            <span className="label-mono text-tyre-grey">Career to date</span>
-          </div>
-          <dl className="grid grid-cols-2 gap-px bg-asphalt-700/70 md:grid-cols-3">
-            {profile.driverStats.map((s) => (
-              <div key={s.label} className="bg-asphalt-900 px-5 py-7 sm:px-7">
-                <dt className="flex flex-col gap-1">
-                  <span className="label-mono text-livery-ink">{s.f1Label ?? s.label}</span>
-                  <span className="text-xs text-tyre-grey">{s.label}</span>
-                </dt>
-                <dd className="mt-4 font-mono text-4xl font-bold tabular sm:text-5xl">
-                  <CountUp value={s.value} suffix={s.suffix} />
-                </dd>
-              </div>
-            ))}
-          </dl>
-        </Reveal>
+      <section className="wrap section-y" aria-labelledby="stats">
+        <SectionLabel index="02">Driver stats</SectionLabel>
+        <h2 id="stats" className="sr-only">
+          Driver stats
+        </h2>
+        <dl className="mt-10 grid grid-cols-2 border-t border-line md:grid-cols-3">
+          {profile.driverStats.map((s, i) => (
+            <Reveal key={s.label} delay={(i % 3) * 0.08} className="border-b border-line py-8 pr-4">
+              <dt className="flex flex-col gap-1">
+                <span className="text-sm">{s.f1Label ?? s.label}</span>
+                <span className="eyebrow">{s.label}</span>
+              </dt>
+              <dd className="display mt-8 text-[clamp(52px,6vw,96px)] font-[500]">
+                <CountUp value={s.value} suffix={s.suffix} />
+              </dd>
+            </Reveal>
+          ))}
+        </dl>
       </section>
 
-      {/* Bio + highlights */}
-      <section className="section-y container-race grid gap-16 lg:grid-cols-12" aria-labelledby="story">
-        <div className="lg:col-span-7">
-          <SectionHeader sector="Sector 1" plain="Biography" title={<span id="story">The story so far</span>} />
-          <Reveal delay={0.1} className="mt-8 space-y-5 text-[17px] leading-[1.75] text-kerb/85">
-            {profile.bioLong.split("\n\n").map((p) => (
-              <p key={p.slice(0, 24)}>{p}</p>
+      {/* Story + highlights */}
+      <section className="wrap grid gap-16 pb-[clamp(96px,12vw,180px)] lg:grid-cols-12" aria-labelledby="story">
+        <div className="lg:col-span-6">
+          <SectionLabel index="03">The story so far</SectionLabel>
+          <h2 id="story" className="sr-only">
+            The story so far
+          </h2>
+          <div className="mt-10 space-y-6 text-[17px] leading-[1.75] text-fg/80">
+            {profile.bioLong.split("\n\n").map((p, i) => (
+              <Reveal key={i} delay={i * 0.08}>
+                <p>{p}</p>
+              </Reveal>
             ))}
-          </Reveal>
+          </div>
         </div>
-        <div className="lg:col-span-5">
-          <Reveal>
-            <SectorLabel sector="Highlights" plain="Career timeline" />
-          </Reveal>
-          <ol className="relative mt-8 border-l border-asphalt-700 pl-8">
+        <div className="lg:col-span-5 lg:col-start-8">
+          <SectionLabel index="04">Career highlights</SectionLabel>
+          <ol className="mt-10 border-t border-line">
             {profile.careerHighlights.map((h, i) => (
-              <Reveal as="li" key={h.year + h.title} delay={i * 0.08} className="relative pb-9 last:pb-0">
-                <span
-                  aria-hidden
-                  className="absolute top-1 -left-[37px] size-2.5 rotate-45 border-2 border-asphalt-950 bg-livery outline outline-1 outline-livery"
-                />
-                <span className="font-mono text-sm font-bold text-livery-ink tabular">{h.year}</span>
-                <p className="mt-1 font-display text-xl font-bold tracking-wide uppercase">{h.title}</p>
-                {h.detail && <p className="mt-1 text-sm text-tyre-grey">{h.detail}</p>}
+              <Reveal as="li" key={h.year + h.title} delay={i * 0.06} className="grid grid-cols-[72px_1fr] gap-4 border-b border-line py-6">
+                <span className="font-mono text-sm text-livery-ink tabular">{h.year}</span>
+                <span>
+                  <span className="block text-[17px] font-medium">{h.title}</span>
+                  {h.detail && <span className="mt-1 block text-sm text-muted">{h.detail}</span>}
+                </span>
               </Reveal>
             ))}
           </ol>
@@ -165,53 +115,47 @@ export default function DriverPage() {
       </section>
 
       {/* Junior formulae + off track */}
-      <section className="container-race grid gap-16 pb-12 lg:grid-cols-12" aria-labelledby="junior">
-        <div className="lg:col-span-8">
-          <SectionHeader
-            sector="Sector 2"
-            plain="Education"
-            title={<span id="junior">Junior formulae</span>}
-            subtitle="The feeder series where the fundamentals were built."
-          />
-          <ul className="mt-10 grid gap-5 sm:grid-cols-2">
+      <section className="wrap grid gap-16 pb-[clamp(96px,12vw,180px)] lg:grid-cols-12" aria-labelledby="junior">
+        <div className="lg:col-span-7">
+          <SectionLabel index="05">Junior formulae — Education</SectionLabel>
+          <h2 id="junior" className="sr-only">
+            Education
+          </h2>
+          <ol className="mt-10 border-t border-line">
             {education.map((e, i) => (
-              <Reveal as="li" key={e.institution} delay={i * 0.08}>
-                <LiveryCard interactive={false} className="h-full p-6">
-                  <div className="flex items-center justify-between">
-                    <span className="label-mono text-livery-ink">F{education.length - i + 1} series</span>
-                    <span className="label-mono text-tyre-grey">
-                      {e.start}–{e.end ?? "Now"}
-                    </span>
-                  </div>
-                  <h3 className="mt-4 text-xl leading-tight font-bold">{e.institution}</h3>
-                  <p className="mt-2 text-sm text-kerb/85">{e.degree}</p>
-                  {e.score && (
-                    <p className="mt-4 font-mono text-sm text-purple tabular">
-                      <span className="sr-only">Score: </span>
-                      {e.score}
-                    </p>
-                  )}
+              <Reveal as="li" key={e.institution} delay={i * 0.08} className="grid gap-3 border-b border-line py-8 md:grid-cols-[120px_1fr_auto]">
+                <span className="font-mono text-sm text-muted tabular">
+                  {e.start}–{e.end ?? "now"}
+                </span>
+                <span>
+                  <span className="display-narrow block text-2xl font-[600]">{e.institution}</span>
+                  <span className="mt-1 block text-fg/80">{e.degree}</span>
                   {e.notes?.map((n) => (
-                    <p key={n} className="mt-2 text-sm text-tyre-grey">
+                    <span key={n} className="mt-2 block text-sm text-muted">
                       {n}
-                    </p>
+                    </span>
                   ))}
-                </LiveryCard>
+                </span>
+                {e.score && <span className="font-mono text-sm tabular">{e.score}</span>}
               </Reveal>
             ))}
-          </ul>
+          </ol>
         </div>
-        <div className="lg:col-span-4">
-          <Reveal>
-            <SectorLabel sector="Off-track" plain="Interests" />
-            <h2 className="mt-5 text-3xl font-black italic">Away from the circuit</h2>
-            <ul className="mt-6 flex flex-wrap gap-2">
-              {profile.interests.map((i) => (
-                <li key={i}>
-                  <Chip className="px-3 py-2 text-xs">{i}</Chip>
-                </li>
+        <div className="lg:col-span-4 lg:col-start-9">
+          <SectionLabel index="06">Off-track</SectionLabel>
+          <Reveal delay={0.1}>
+            <p className="mt-10 text-[clamp(22px,2.2vw,30px)] leading-[1.3] tracking-[-0.02em]">
+              {profile.interests.map((it, i) => (
+                <span key={it}>
+                  {it}
+                  {i < profile.interests.length - 1 && <span className="text-livery">, </span>}
+                </span>
               ))}
-            </ul>
+              <span className="text-livery">.</span>
+            </p>
+          </Reveal>
+          <Reveal delay={0.2} className="mt-10">
+            <ArrowLink href={profile.resumeUrl}>Download spec sheet</ArrowLink>
           </Reveal>
         </div>
       </section>

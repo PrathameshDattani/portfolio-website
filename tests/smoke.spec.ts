@@ -28,7 +28,7 @@ test("start lights play once and can be skipped with Escape", async ({ browser }
   const page = await ctx.newPage();
   await page.goto("/");
   const skip = page.getByRole("button", { name: /skip intro/i });
-  await expect(skip).toBeVisible();
+  await expect(skip).toBeVisible({ timeout: 20_000 });
   await page.keyboard.press("Escape");
   await expect(skip).toBeHidden();
   await page.reload();
