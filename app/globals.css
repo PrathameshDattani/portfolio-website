@@ -1,0 +1,425 @@
+@import "tailwindcss";
+
+/* ───────────────────────── Tokens ───────────────────────── */
+:root {
+  --asphalt-950: #0a0a0b;
+  --asphalt-900: #121214;
+  --asphalt-800: #1c1c20;
+  --asphalt-700: #2a2a30;
+  --asphalt-600: #3a3a42;
+  --kerb-white: #f4f4f5;
+  --tyre-grey: #9ca3af;
+
+  /* --livery and --livery-2 are injected from content/theme.ts on <html> */
+  --livery: #e10600;
+  --livery-2: #ff8a00;
+  /* lighter variant of the livery for small text: keeps AA contrast on dark surfaces */
+  --livery-ink: color-mix(in oklab, var(--livery) 72%, white);
+  --livery-soft: color-mix(in oklab, var(--livery) 16%, transparent);
+  --livery-glow: color-mix(in oklab, var(--livery) 45%, transparent);
+
+  --sector-purple: #a855f7;
+  --sector-green: #22c55e;
+  --sector-yellow: #eab308;
+  --flag-red: #ef4444;
+  --drs-cyan: #06b6d4;
+
+  --tyre-soft: #ef4444;
+  --tyre-medium: #eab308;
+  --tyre-hard: #f4f4f5;
+  --tyre-inter: #22c55e;
+  --tyre-wet: #3b82f6;
+
+  --ease-race: cubic-bezier(0.22, 1, 0.36, 1);
+  --nav-h: 68px;
+
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-asphalt-950: var(--asphalt-950);
+  --color-asphalt-900: var(--asphalt-900);
+  --color-asphalt-800: var(--asphalt-800);
+  --color-asphalt-700: var(--asphalt-700);
+  --color-asphalt-600: var(--asphalt-600);
+  --color-kerb: var(--kerb-white);
+  --color-tyre-grey: var(--tyre-grey);
+  --color-livery: var(--livery);
+  --color-livery-2: var(--livery-2);
+  --color-livery-ink: var(--livery-ink);
+  --color-livery-soft: var(--livery-soft);
+  --color-purple: var(--sector-purple);
+  --color-green: var(--sector-green);
+  --color-yellow: var(--sector-yellow);
+  --color-flag-red: var(--flag-red);
+  --color-drs: var(--drs-cyan);
+
+  --font-display: var(--font-titillium), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, "SFMono-Regular", monospace;
+
+  --ease-race: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ───────────────────────── Base ───────────────────────── */
+@layer base {
+  html {
+    background: var(--asphalt-950);
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    scrollbar-gutter: stable;
+  }
+
+  body {
+    background: var(--asphalt-950);
+    color: var(--kerb-white);
+    font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 1.6;
+    min-height: 100dvh;
+    overflow-x: clip;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    line-height: 1.02;
+    font-weight: 700;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  ::selection {
+    background: var(--livery);
+    color: #fff;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--livery-ink);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--asphalt-600) transparent;
+  }
+
+  button {
+    cursor: pointer;
+  }
+}
+
+/* Lenis smooth scroll */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+/* ───────────────────────── Utilities ───────────────────────── */
+@utility container-race {
+  width: 100%;
+  max-width: 1280px;
+  margin-inline: auto;
+  padding-inline: 16px;
+  @media (min-width: 640px) {
+    padding-inline: 24px;
+  }
+}
+
+@utility section-y {
+  padding-block: 80px;
+  @media (min-width: 1024px) {
+    padding-block: 128px;
+  }
+}
+
+@utility tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+@utility label-mono {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+}
+
+@utility skew-speed {
+  transform: skewX(-12deg);
+}
+@utility unskew-speed {
+  transform: skewX(12deg);
+}
+
+@utility display-italic {
+  font-style: italic;
+}
+
+@utility text-outline {
+  color: transparent;
+  -webkit-text-stroke: 1.5px var(--asphalt-700);
+}
+
+/* Subtle carbon-fibre weave */
+@utility carbon {
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M0 0h4v4H0zM4 4h4v4H4z' fill='%23ffffff' fill-opacity='0.05'/%3E%3C/svg%3E");
+  background-size: 8px 8px;
+}
+
+/* Diagonal livery stripes */
+@utility livery-stripes {
+  background-image: repeating-linear-gradient(
+    -60deg,
+    var(--livery) 0 6px,
+    transparent 6px 14px
+  );
+}
+
+@utility chequered {
+  background-image:
+    conic-gradient(var(--kerb-white) 25%, var(--asphalt-950) 0 50%, var(--kerb-white) 0 75%, var(--asphalt-950) 0);
+  background-size: 12px 12px;
+}
+
+@utility grid-lines {
+  background-image:
+    linear-gradient(to right, color-mix(in oklab, var(--kerb-white) 5%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in oklab, var(--kerb-white) 5%, transparent) 1px, transparent 1px);
+  background-size: 64px 64px;
+}
+
+@utility mask-fade-b {
+  mask-image: linear-gradient(to bottom, black 55%, transparent);
+}
+@utility mask-fade-x {
+  mask-image: linear-gradient(to right, transparent, black 12%, black 88%, transparent);
+}
+
+/* ───────────────────────── Components ───────────────────────── */
+
+/* Film grain overlay: fixed, cheap, non-interactive */
+.grain {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 60;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Livery card */
+.livery-card {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-radius: 6px;
+  border: 1px solid var(--asphalt-700);
+  background:
+    linear-gradient(180deg, color-mix(in oklab, var(--asphalt-800) 70%, transparent), var(--asphalt-900));
+  transition:
+    transform 0.5s var(--ease-race),
+    border-color 0.5s var(--ease-race),
+    box-shadow 0.5s var(--ease-race);
+  --card-accent: var(--livery);
+}
+.livery-card::before {
+  /* diagonal stripe edge, top-right */
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 120px;
+  height: 4px;
+  background: repeating-linear-gradient(-60deg, var(--card-accent) 0 6px, transparent 6px 10px);
+  opacity: 0.9;
+  z-index: 1;
+}
+.livery-card::after {
+  /* sheen */
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 40%,
+    color-mix(in oklab, var(--kerb-white) 6%, transparent) 50%,
+    transparent 60%
+  );
+  transform: translateX(-100%);
+  transition: transform 0.9s var(--ease-race);
+  pointer-events: none;
+  z-index: 2;
+}
+.livery-card[data-interactive="true"]:hover,
+.livery-card[data-interactive="true"]:focus-within {
+  transform: translateY(-4px);
+  border-color: color-mix(in oklab, var(--card-accent) 55%, var(--asphalt-700));
+  box-shadow: 0 24px 60px -28px color-mix(in oklab, var(--card-accent) 60%, transparent);
+}
+.livery-card[data-interactive="true"]:hover::after {
+  transform: translateX(100%);
+}
+
+/* Stretched link: makes a whole card clickable while letting inner links sit above */
+.stretched-link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+}
+
+/* DRS button */
+.btn-drs {
+  transform: skewX(-12deg);
+  transition:
+    transform 0.3s var(--ease-race),
+    background-color 0.3s var(--ease-race),
+    box-shadow 0.3s var(--ease-race);
+}
+.btn-drs:hover {
+  transform: skewX(-12deg) scaleX(1.035);
+}
+.btn-drs .drs-flap {
+  transform: perspective(200px) rotateX(-95deg);
+  transform-origin: bottom;
+  opacity: 0;
+  transition:
+    transform 0.35s var(--ease-race),
+    opacity 0.2s var(--ease-race);
+}
+.btn-drs:hover .drs-flap,
+.btn-drs:focus-visible .drs-flap {
+  transform: perspective(200px) rotateX(0deg);
+  opacity: 1;
+}
+.btn-drs .btn-arrow {
+  transition: transform 0.3s var(--ease-race);
+}
+.btn-drs:hover .btn-arrow {
+  transform: translateX(4px);
+}
+
+/* Speed lines in the hero */
+.speed-line {
+  position: absolute;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, color-mix(in oklab, var(--kerb-white) 35%, transparent), transparent);
+  animation: speed-line linear infinite;
+  will-change: transform;
+}
+@keyframes speed-line {
+  from {
+    transform: translateX(-30vw);
+  }
+  to {
+    transform: translateX(130vw);
+  }
+}
+
+/* Radio waveform */
+.wave-bar {
+  transform-origin: center;
+  animation: wave 1.1s ease-in-out infinite;
+}
+@keyframes wave {
+  0%,
+  100% {
+    transform: scaleY(0.25);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+
+@keyframes pulse-dot {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.35;
+    transform: scale(0.8);
+  }
+}
+.live-dot {
+  animation: pulse-dot 1.6s ease-in-out infinite;
+}
+
+@keyframes caret {
+  50% {
+    opacity: 0;
+  }
+}
+.caret {
+  animation: caret 1s steps(1) infinite;
+}
+
+/* Flag wave on the 404 page */
+@keyframes flag-wave {
+  0%,
+  100% {
+    transform: skewY(0deg) scaleX(1);
+  }
+  50% {
+    transform: skewY(-4deg) scaleX(0.96);
+  }
+}
+.flag-wave {
+  transform-origin: left center;
+  animation: flag-wave 1.4s ease-in-out infinite;
+}
+
+@keyframes dust {
+  0% {
+    transform: translate(0, 0) scale(0.6);
+    opacity: 0.6;
+  }
+  100% {
+    transform: translate(var(--dx), -26px) scale(1.4);
+    opacity: 0;
+  }
+}
+.dust {
+  animation: dust 1.8s ease-out infinite;
+}
+
+/* Intro overlay is hidden immediately (pre-hydration) if already seen this session */
+html.intro-seen .start-lights {
+  display: none;
+}
+
+/* ───────────────────────── Reduced motion ───────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .speed-line,
+  .grain {
+    display: none;
+  }
+}
