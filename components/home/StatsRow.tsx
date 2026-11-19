@@ -10,13 +10,14 @@ export function StatsRow({ stats }: { stats: Stat[] }) {
         <Reveal
           key={s.label}
           delay={i * 0.08}
-          className="flex flex-col gap-10 border-b border-line py-8 pr-6 odd:border-r lg:border-b-0 lg:border-r lg:last:border-r-0 lg:[&:not(:first-child)]:pl-8"
+          className="@container flex min-w-0 flex-col gap-10 border-b border-line py-8 pr-6 odd:border-r lg:border-b-0 lg:border-r lg:last:border-r-0 lg:[&:not(:first-child)]:pl-8"
         >
           <dt className="flex items-baseline justify-between gap-3">
             <span className="text-sm text-fg/80">{s.label}</span>
             {s.f1Label && <span className="eyebrow hidden sm:inline">{s.f1Label}</span>}
           </dt>
-          <dd className="display text-[clamp(56px,7vw,112px)] font-[500]">
+          {/* sized to the cell so "30K+" never spills into the next column */}
+          <dd className="display text-[clamp(32px,23cqi,112px)] font-[500] whitespace-nowrap">
             <CountUp value={s.value} suffix={s.suffix} />
           </dd>
         </Reveal>

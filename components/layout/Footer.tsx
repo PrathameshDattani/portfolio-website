@@ -15,12 +15,13 @@ export function Footer() {
     <footer className="relative overflow-hidden border-t border-line bg-ink-950 pt-24">
       <div className="wrap">
         <div className="grid gap-16 lg:grid-cols-12">
-          <div className="lg:col-span-6">
+          <div className="@container min-w-0 lg:col-span-6">
             <p className="eyebrow">Pit wall · open channel</p>
+            {/* sized to its column (~16.5em for the address) so it can't run into the index */}
             <a
               href={`mailto:${socials.email}`}
               data-cursor="Write"
-              className="group mt-6 inline-block text-[clamp(28px,4.4vw,64px)] leading-[1.05] font-medium tracking-[-0.03em]"
+              className="group mt-6 inline-block max-w-full text-[clamp(18px,5.8cqi,64px)] leading-[1.05] font-medium tracking-[-0.03em] [overflow-wrap:anywhere]"
             >
               <span className="u-draw pb-1">{socials.email}</span>
             </a>
